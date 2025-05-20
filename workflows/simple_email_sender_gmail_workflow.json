@@ -1,0 +1,70 @@
+{
+  "name": "simple Email Sender Gmail Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "email-send",
+        "options": {
+          "responseData": {
+            "responseBody": "Email received successfully."
+          }
+        }
+      },
+      "id": "7869f344-1322-4d15-bbe4-5db563becf8b",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "loyalty-send-email"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "subject": "={{$json[\"subject\"]}}",
+        "additionalFields": {}
+      },
+      "id": "ddde6b79-6932-4960-aaf4-3c47464450d7",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 1,
+      "position": [
+        200,
+        0
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "={{$env.GMAIL_OAUTH_CRED_ID}}",
+          "name": "={{$env.GMAIL_ACCOUNT_NAME}}"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "30c76319-0dba-4da6-a1bd-3854a4af0bfa",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "07523da8f37d1b1c796e8c6960b1700b96718d3943c5731d2d5ebaa73b9b57c6"
+  },
+  "id": "nLHBajFe4hg2MTeK",
+  "tags": []
+}
