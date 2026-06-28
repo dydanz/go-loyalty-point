@@ -141,6 +141,8 @@ This project follows a lightweight multi-phase SDLC. Full agent: `.claude/agents
 | `class:high` | TRD in issue / doc | Self-approval + 2nd review | Full suite + manual | `feature/<id>-slug` |
 | `class:hotfix` | Skip; post-merge ≤24h | Self-approval + smoke | Smoke | `hotfix/<id>-slug` |
 
+**Issue creation skill:** `.claude/skills/github-issue/SKILL.md` — invoke via `/github-issue` or say "register tasks" / "create issues from TRD". Turns `docs/trd/<phase>/sprint-*.md` into a tracked backlog: Epic (sprint) → User Story (task), with estimation (size + story points + confidence), tagging (`type/*`, `class:*`, `component/*`, `phase/*`, `sprint/*`), and Project board fields. Draft-only — confirm before any `gh issue` write.
+
 **PR creation skill:** `.claude/skills/github-pr/SKILL.md` — invoke via `/github-pr` or say "create PR".
 
 ---
