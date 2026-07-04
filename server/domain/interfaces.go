@@ -16,7 +16,6 @@ type UserRepository interface {
 	Update(ctx context.Context, user *User) error
 	Delete(ctx context.Context, id string) error
 	UpdateTx(ctx context.Context, tx *sql.Tx, user *User) error
-	GetRandomActiveUser(ctx context.Context) (*User, error)
 }
 
 type CacheRepository interface {
@@ -48,8 +47,6 @@ type AuthService interface {
 	Logout(ctx context.Context, userID string, tokenHash string) error
 	VerifyRegistration(ctx context.Context, req *VerificationRequest) error
 	GetUserByEmail(ctx context.Context, email string) (*User, error)
-	GetVerificationByUserID(ctx context.Context, userID string) (*RegistrationVerification, error)
-	GetRandomActiveUser(ctx context.Context) (*User, error)
 }
 
 // PointsRepository handles points balance operations

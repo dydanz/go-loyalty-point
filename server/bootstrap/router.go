@@ -26,7 +26,6 @@ type Handlers struct {
 	RewardsHandler           *handler.RewardsHandler
 	RedemptionHandler        *handler.RedemptionHandler
 	PingHandler              *handler.PingHandler
-	InternalLoadTestHandler  *handler.InternalLoadTestHandler
 	MerchantHandler          *handler.MerchantHandler
 	MerchantCustomersHandler *handler.MerchantCustomersHandler
 	ProgramHandler           *handler.ProgramHandler
@@ -43,7 +42,6 @@ func InitializeHandlers(services *Services, db *sql.DB, dbReplication *sql.DB, r
 		RewardsHandler:           handler.NewRewardsHandler(services.RewardsService),
 		RedemptionHandler:        handler.NewRedemptionHandler(services.RedemptionService),
 		PingHandler:              handler.NewPingHandler(db, dbReplication, rdb),
-		InternalLoadTestHandler:  handler.NewInternalLoadTestHandler(services.AuthService),
 		MerchantHandler:          handler.NewMerchantHandler(services.MerchantService),
 		MerchantCustomersHandler: handler.NewMerchantCustomersHandler(services.MerchantCustomersService),
 		ProgramHandler:           handler.NewProgramHandler(services.ProgramService),
@@ -108,10 +106,6 @@ func SetupRouter(h *Handlers, authRepo *postgres.AuthRepository, sessionRepo red
 		auth.POST("/register", h.AuthHandler.Register)
 		auth.POST("/verify", h.AuthHandler.Verify)
 		auth.POST("/login", h.AuthHandler.Login)
-
-		// FOR LOAD TEST ONLY
-		auth.GET("/test/get-verification/code", h.InternalLoadTestHandler.GetVerificationCode)
-		auth.GET("/test/random-user", h.InternalLoadTestHandler.GetRandomVerifiedUser)
 	}
 
 	// Protected routes with auth middleware

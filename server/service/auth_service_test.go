@@ -582,38 +582,6 @@ func (s *AuthServiceTestSuite) TestGetUserByEmail_NotFound() {
 }
 
 // Test cases for GetRandomActiveUser
-func (s *AuthServiceTestSuite) TestGetRandomActiveUser_Success() {
-	ctx := context.Background()
-
-	expectedUser := &domain.User{
-		ID:     "user123",
-		Email:  "test@example.com",
-		Name:   "Test User",
-		Status: domain.UserStatusActive,
-	}
-
-	s.userRepo.On("GetRandomActiveUser", ctx).Return(expectedUser, nil)
-
-	user, err := s.authService.GetRandomActiveUser(ctx)
-
-	s.NoError(err)
-	s.NotNil(user)
-	s.Equal(expectedUser.ID, user.ID)
-	s.Equal(domain.UserStatusActive, user.Status)
-}
-
-func (s *AuthServiceTestSuite) TestGetRandomActiveUser_NoActiveUsers() {
-	ctx := context.Background()
-
-	s.userRepo.On("GetRandomActiveUser", ctx).Return(nil, nil)
-
-	user, err := s.authService.GetRandomActiveUser(ctx)
-
-	s.Error(err)
-	s.Nil(user)
-	s.IsType(domain.ResourceNotFoundError{}, err)
-}
-
 // Test cases for edge cases and error handling
 func (s *AuthServiceTestSuite) TestLogin_DatabaseError() {
 	ctx := context.Background()

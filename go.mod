@@ -2,7 +2,7 @@ module go-playground
 
 go 1.23.0
 
-toolchain go1.23.4
+toolchain go1.25.0
 
 require (
 	github.com/gin-contrib/cors v1.7.3

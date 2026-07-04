@@ -1,11 +1,25 @@
 package util
 
 import (
+	"go-playground/pkg/logging"
 	"go-playground/server/domain"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog"
 )
+
+// logErrorLogger is the logger used by LogError; replaceable in tests via SetLogErrorLogger.
+var logErrorLogger zerolog.Logger
+
+func init() {
+	logErrorLogger = logging.GetLogger()
+}
+
+// SetLogErrorLogger replaces the logger used by LogError (test helper).
+func SetLogErrorLogger(l zerolog.Logger) {
+	logErrorLogger = l
+}
 
 // ErrorResponse represents a standardized error response
 type ErrorResponse struct {
@@ -90,8 +104,7 @@ func HandleError(c *gin.Context, err error) {
 
 	case domain.SystemError:
 		statusCode = http.StatusInternalServerError
-		// Log the full error with stack trace for system errors
-		LogError(e)
+		LogError(c, e)
 		response = ErrorResponse{
 			Status:  "error",
 			Message: "An internal server error occurred",
@@ -100,8 +113,7 @@ func HandleError(c *gin.Context, err error) {
 
 	default:
 		statusCode = http.StatusInternalServerError
-		// Log unexpected errors
-		LogError(err)
+		LogError(c, err)
 		response = ErrorResponse{
 			Status:  "error",
 			Message: "An internal server error occurred",
@@ -112,19 +124,23 @@ func HandleError(c *gin.Context, err error) {
 	c.JSON(statusCode, response)
 }
 
-// LogError logs error details for monitoring and debugging
-func LogError(err error) {
-	// TODO: Implement proper logging with your preferred logging library
-	// Example using standard log package:
-	// log.Printf("[ERROR] %v", err)
-	//
-	// For production, consider using structured logging with:
-	// - Timestamp
-	// - Error message
-	// - Stack trace
-	// - Request ID
-	// - User ID (if available)
-	// - Additional context
+// LogError emits a structured zerolog error entry with route and correlation ID.
+func LogError(c *gin.Context, err error) {
+	route := ""
+	correlationID := ""
+	if c != nil && c.Request != nil {
+		route = c.Request.URL.Path
+		correlationID = c.GetHeader("X-Correlation-ID")
+		if correlationID == "" {
+			correlationID = c.GetString("correlation_id")
+		}
+	}
+
+	event := logErrorLogger.Error().Err(err).Str("route", route)
+	if correlationID != "" {
+		event = event.Str("correlation_id", correlationID)
+	}
+	event.Msg("internal server error")
 }
 
 // EmptyResponse returns a 200 OK with empty data when no results are found

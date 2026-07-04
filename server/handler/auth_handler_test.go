@@ -55,22 +55,6 @@ func (m *MockAuthService) GetUserByEmail(ctx context.Context, email string) (*do
 	return args.Get(0).(*domain.User), args.Error(1)
 }
 
-func (m *MockAuthService) GetVerificationByUserID(ctx context.Context, userID string) (*domain.RegistrationVerification, error) {
-	args := m.Called(ctx, userID)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*domain.RegistrationVerification), args.Error(1)
-}
-
-func (m *MockAuthService) GetRandomActiveUser(ctx context.Context) (*domain.User, error) {
-	args := m.Called(ctx)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*domain.User), args.Error(1)
-}
-
 // AuthHandlerTestSuite defines the test suite
 type AuthHandlerTestSuite struct {
 	suite.Suite
