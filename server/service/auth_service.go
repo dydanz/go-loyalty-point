@@ -395,34 +395,6 @@ func (s *AuthService) GetUserByEmail(ctx context.Context, email string) (*domain
 	return user, nil
 }
 
-func (s *AuthService) GetVerificationByUserID(ctx context.Context, userID string) (*domain.RegistrationVerification, error) {
-	verification, err := s.authRepo.GetLatestVerification(ctx, userID)
-	if err != nil {
-		return nil, domain.ResourceNotFoundError{
-			Resource: "verification",
-			Message:  fmt.Sprintf("Error finding verification: %v", err),
-		}
-	}
-	return verification, nil
-}
-
-func (s *AuthService) GetRandomActiveUser(ctx context.Context) (*domain.User, error) {
-	user, err := s.userRepo.GetRandomActiveUser(ctx)
-	if err != nil {
-		return nil, domain.ResourceNotFoundError{
-			Resource: "user",
-			Message:  fmt.Sprintf("Error finding random user: %v", err),
-		}
-	}
-	if user == nil {
-		return nil, domain.ResourceNotFoundError{
-			Resource: "user",
-			Message:  "No active users found",
-		}
-	}
-	return user, nil
-}
-
 func (s *AuthService) generateOTP() string {
 	const digits = "0123456789"
 	result := make([]byte, 6)

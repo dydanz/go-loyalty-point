@@ -72,9 +72,6 @@ func main() {
 		log.Printf("Failed to run migrations: %v", err)
 	}
 
-	// Start Cleanup User Session
-	repos.SessionRepo.DeleteAllSession(rdb.Context())
-
 	// Start cleanup goroutine
 	go func() {
 		ticker := time.NewTicker(1 * time.Hour)

@@ -34,7 +34,6 @@ WORKDIR /app
 COPY --from=builder /app/server/migrations ./server/migrations
 COPY --from=builder /app/server/docs ./server/docs
 COPY --from=builder /app/loyalty_engine .
-COPY --from=builder /app/.env .
 
 # Expose the port your app runs on
 EXPOSE 8080

@@ -145,6 +145,8 @@ This project follows a lightweight multi-phase SDLC. Full agent: `.claude/agents
 
 **PR creation skill:** `.claude/skills/github-pr/SKILL.md` — invoke via `/github-pr` or say "create PR".
 
+**Sprint implementation skill:** `.claude/skills/implement-sprint/SKILL.md` (+ `/implement-sprint`, runs on Sonnet) — principal fullstack engineer (Go + ReactJS) that implements `docs/trd/<phase>/sprint-*.md` **one task per run**, test-first, pattern-faithful, with Swagger + draft PR. Daily-Routine friendly: `/implement-sprint --daily` advances the TRD by one tested, draft-PR'd task per day (never merges, never pushes `master`).
+
 ---
 
 ## graphify

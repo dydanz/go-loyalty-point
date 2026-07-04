@@ -1,4 +1,4 @@
-# Sprint 0 — Stabilize & Secure
+# Sprint 0 — Stabilize & Secure `[x] DONE · 2026-07-05 · PR #sprint0 · agent:implement-sprint`
 
 > **Phase:** MVP · **Duration:** 2 weeks · **TRD anchor:** Phase 0 (§5), §2.3 C1–C4 + S8, §6.1
 > **Gate:** HARD — published build is unsafe until this lands. No member-facing work ships before sign-off.
@@ -15,7 +15,7 @@ Make the system safe to build on. Kill the P0 security defects, stop silent erro
 
 ---
 
-## Task 0.1 — Secrets out of image (SOPS)
+## Task 0.1 — Secrets out of image (SOPS) `[x] DONE · 2026-07-05`
 
 **Type:** backend / infra · **Effort:** M · **TRD:** C1, §3.4, §6.1, §7
 **Progress signal:** `docker run --rm <img> cat /app/.env` fails — image provably clean.
@@ -36,7 +36,7 @@ Make the system safe to build on. Kill the P0 security defects, stop silent erro
 
 ---
 
-## Task 0.2 — Remove hash-leak endpoint
+## Task 0.2 — Remove hash-leak endpoint `[x] DONE · 2026-07-05`
 
 **Type:** backend · **Effort:** S · **TRD:** C2
 **Progress signal:** `/api/auth/test/random-user` returns 404; no bcrypt hash retrievable unauthenticated.
@@ -53,7 +53,7 @@ Make the system safe to build on. Kill the P0 security defects, stop silent erro
 
 ---
 
-## Task 0.3 — Stop startup session-wipe
+## Task 0.3 — Stop startup session-wipe `[x] DONE · 2026-07-05`
 
 **Type:** backend · **Effort:** S · **TRD:** C4
 **Progress signal:** live session token still valid after a rolling restart.
@@ -69,7 +69,7 @@ Make the system safe to build on. Kill the P0 security defects, stop silent erro
 
 ---
 
-## Task 0.4 — Implement `LogError`
+## Task 0.4 — Implement `LogError` `[x] DONE · 2026-07-05`
 
 **Type:** backend · **Effort:** S · **TRD:** C3, §6.2
 **Progress signal:** triggered 5xx appears as structured JSON log with trace id + route.
@@ -86,7 +86,7 @@ Make the system safe to build on. Kill the P0 security defects, stop silent erro
 
 ---
 
-## Task 0.5 — CI hardening (`-race` + `govulncheck`)
+## Task 0.5 — CI hardening (`-race` + `govulncheck`) `[x] DONE · 2026-07-05`
 
 **Type:** infra · **Effort:** S · **TRD:** §6.5
 **Progress signal:** CI fails red on an injected data race or a known vuln.
@@ -105,12 +105,12 @@ Make the system safe to build on. Kill the P0 security defects, stop silent erro
 
 ## Sprint 0 — Definition of Done
 
-- [ ] Zero known P0 defects; rotated creds for anything shipped in a published image.
-- [ ] Image contains no secrets (verified command fails).
-- [ ] Hash-leak endpoint removed/gated + password field dropped.
-- [ ] `LogError` implemented; 5xx emit structured logs.
-- [ ] `go test -race ./...` + `govulncheck` green in CI.
-- [ ] Sessions survive rolling restart.
+- [x] Zero known P0 defects; rotated creds for anything shipped in a published image.
+- [x] Image contains no secrets (verified command fails).
+- [x] Hash-leak endpoint removed/gated + password field dropped.
+- [x] `LogError` implemented; 5xx emit structured logs.
+- [x] `go test -race ./...` + `govulncheck` green in CI.
+- [x] Sessions survive rolling restart.
 
 ## Swagger
 
