@@ -1,4 +1,4 @@
-# Sprint 0 — Stabilize & Secure `[x] DONE · 2026-07-05 · PR #sprint0 · agent:implement-sprint`
+# Sprint 0 — Stabilize & Secure `[x] DONE · 2026-07-05 · PR #32 · agent:implement-sprint`
 
 > **Phase:** MVP · **Duration:** 2 weeks · **TRD anchor:** Phase 0 (§5), §2.3 C1–C4 + S8, §6.1
 > **Gate:** HARD — published build is unsafe until this lands. No member-facing work ships before sign-off.

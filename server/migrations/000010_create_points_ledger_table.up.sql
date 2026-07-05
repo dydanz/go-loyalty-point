@@ -1,12 +1,7 @@
-DROP TABLE IF EXISTS points_balance; 
 
 CREATE TYPE point_tx_type AS ENUM (
     'point_multiplier',
     'point_bonus',
-    'point_expiration',
-    'point_transfer',
-    'point_conversion',
-    'point_redemption',
     'point_expiration',
     'point_transfer',
     'point_conversion',
