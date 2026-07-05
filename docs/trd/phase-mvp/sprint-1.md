@@ -15,7 +15,7 @@ Earn computed by the **real rule engine**, not hardcoded constants. Money paths 
 
 ---
 
-## Task 1.1 — Wire rule engine into earn path `[x] DONE · 2026-07-06 12:00 +07 · agent:implement-sprint`
+## Task 1.1 — Wire rule engine into earn path `[x] DONE · 2026-07-06 12:00 +07 · PR #33 · agent:implement-sprint`
 
 **Type:** backend · **Effort:** L · **TRD:** FR-1.2
 **Progress signal:** same transaction under two different active rules yields two different point totals.
