@@ -180,103 +180,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/test/get-verification/code": {
-            "get": {
-                "description": "Get OTP verification code by email (for testing purposes only)",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "internal-load-testing"
-                ],
-                "summary": "Get verification code for testing",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Email address",
-                        "name": "email",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/auth/test/random-user": {
-            "get": {
-                "description": "Get a random verified user's credentials (for testing purposes only)",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "internal-load-testing"
-                ],
-                "summary": "Get random verified user",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/auth/verify": {
             "post": {
                 "description": "Verify user registration using OTP",
@@ -1268,7 +1171,7 @@ const docTemplate = `{
         },
         "/program-rules/by-merchant/{merchant_id}": {
             "get": {
-                "description": "Get all program rules across all programs for a specific merchant",
+                "description": "Get all program rules across all programs for a specific merchant with pagination",
                 "consumes": [
                     "application/json"
                 ],
@@ -1286,20 +1189,29 @@ const docTemplate = `{
                         "name": "merchant_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number (default: 1)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Items per page (default: 10, max: 100)",
+                        "name": "limit",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/service.ProgramRuleWithProgram"
-                            }
+                            "$ref": "#/definitions/domain.PaginatedResponse"
                         }
                     },
                     "400": {
-                        "description": "Invalid merchant ID format",
+                        "description": "Invalid merchant ID format or pagination parameters",
                         "schema": {
                             "$ref": "#/definitions/util.ErrorResponse"
                         }
@@ -2511,7 +2423,7 @@ const docTemplate = `{
                         "UserIdAuth": []
                     }
                 ],
-                "description": "Create a new transaction",
+                "description": "Create a new transaction. Points earned on purchase/bonus transactions are computed by the program's active rule engine (no matching rule awards 0 points); refunds deduct the transacted amount 1:1.",
                 "consumes": [
                     "application/json"
                 ],
@@ -3368,6 +3280,24 @@ const docTemplate = `{
                 }
             }
         },
+        "domain.PaginatedResponse": {
+            "type": "object",
+            "properties": {
+                "current_page": {
+                    "type": "integer"
+                },
+                "data": {},
+                "per_page": {
+                    "type": "integer"
+                },
+                "total_items": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
         "domain.Pagination": {
             "type": "object",
             "properties": {
@@ -3753,6 +3683,12 @@ const docTemplate = `{
                 "UserStatusLocked": "Account locked due to violations",
                 "UserStatusPending": "Initial state after registration"
             },
+            "x-enum-descriptions": [
+                "Initial state after registration",
+                "Email verified, can login",
+                "Account locked due to violations",
+                "Account banned by admin"
+            ],
             "x-enum-varnames": [
                 "UserStatusPending",
                 "UserStatusActive",
@@ -3771,38 +3707,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "otp": {
-                    "type": "string"
-                }
-            }
-        },
-        "service.ProgramRuleWithProgram": {
-            "type": "object",
-            "properties": {
-                "condition_type": {
-                    "type": "string"
-                },
-                "condition_value": {
-                    "type": "string"
-                },
-                "effective_from": {
-                    "type": "string"
-                },
-                "effective_to": {
-                    "type": "string"
-                },
-                "multiplier": {
-                    "type": "number"
-                },
-                "points_awarded": {
-                    "type": "integer"
-                },
-                "program_id": {
-                    "type": "string"
-                },
-                "program_name": {
-                    "type": "string"
-                },
-                "rule_name": {
                     "type": "string"
                 }
             }

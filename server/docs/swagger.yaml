@@ -229,6 +229,18 @@ definitions:
       pagination:
         $ref: '#/definitions/domain.Pagination'
     type: object
+  domain.PaginatedResponse:
+    properties:
+      current_page:
+        type: integer
+      data: {}
+      per_page:
+        type: integer
+      total_items:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
   domain.Pagination:
     properties:
       current_page:
@@ -487,6 +499,11 @@ definitions:
       UserStatusBanned: Account banned by admin
       UserStatusLocked: Account locked due to violations
       UserStatusPending: Initial state after registration
+    x-enum-descriptions:
+    - Initial state after registration
+    - Email verified, can login
+    - Account locked due to violations
+    - Account banned by admin
     x-enum-varnames:
     - UserStatusPending
     - UserStatusActive
@@ -501,27 +518,6 @@ definitions:
     required:
     - email
     - otp
-    type: object
-  service.ProgramRuleWithProgram:
-    properties:
-      condition_type:
-        type: string
-      condition_value:
-        type: string
-      effective_from:
-        type: string
-      effective_to:
-        type: string
-      multiplier:
-        type: number
-      points_awarded:
-        type: integer
-      program_id:
-        type: string
-      program_name:
-        type: string
-      rule_name:
-        type: string
     type: object
   util.ErrorResponse:
     properties:
@@ -647,71 +643,6 @@ paths:
       summary: Register new user
       tags:
       - auth
-  /auth/test/get-verification/code:
-    get:
-      consumes:
-      - application/json
-      description: Get OTP verification code by email (for testing purposes only)
-      parameters:
-      - description: Email address
-        in: query
-        name: email
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Get verification code for testing
-      tags:
-      - internal-load-testing
-  /auth/test/random-user:
-    get:
-      consumes:
-      - application/json
-      description: Get a random verified user's credentials (for testing purposes
-        only)
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Get random verified user
-      tags:
-      - internal-load-testing
   /auth/verify:
     post:
       consumes:
@@ -1468,23 +1399,30 @@ paths:
       consumes:
       - application/json
       description: Get all program rules across all programs for a specific merchant
+        with pagination
       parameters:
       - description: Merchant ID
         in: path
         name: merchant_id
         required: true
         type: string
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Items per page (default: 10, max: 100)'
+        in: query
+        name: limit
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/service.ProgramRuleWithProgram'
-            type: array
+            $ref: '#/definitions/domain.PaginatedResponse'
         "400":
-          description: Invalid merchant ID format
+          description: Invalid merchant ID format or pagination parameters
           schema:
             $ref: '#/definitions/util.ErrorResponse'
         "500":
@@ -2142,7 +2080,9 @@ paths:
     post:
       consumes:
       - application/json
-      description: Create a new transaction
+      description: Create a new transaction. Points earned on purchase/bonus transactions
+        are computed by the program's active rule engine (no matching rule awards
+        0 points); refunds deduct the transacted amount 1:1.
       parameters:
       - description: Transaction details
         in: body

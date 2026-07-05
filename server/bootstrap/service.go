@@ -28,6 +28,7 @@ func InitializeServices(repos *Repositories) *Services {
 		pointsService,
 		eventLoggerService,
 		repos.MerchantCustomersRepo,
+		repos.ProgramRuleRepo,
 	)
 	redemptionService := service.NewRedemptionService(
 		repos.RedemptionRepo,
