@@ -37,7 +37,7 @@ Earn computed by the **real rule engine**, not hardcoded constants. Money paths 
 
 ---
 
-## Task 1.2 — Delete shadow types `[x] DONE · 2026-07-06 20:00 +07 · agent:implement-sprint`
+## Task 1.2 — Delete shadow types `[x] DONE · 2026-07-06 20:00 +07 · PR #34 · agent:implement-sprint`
 
 **Type:** backend · **Effort:** S · **TRD:** FR-1.2, S1
 **Progress signal:** engine compiles against domain types only; duplicate types gone, tests still green.
