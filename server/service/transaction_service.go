@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"time"
 
 	"go-playground/pkg/logging"
 	"go-playground/server/domain"
@@ -15,6 +16,7 @@ type TransactionService struct {
 	pointsService        domain.PointsService
 	eventLoggerService   domain.EventLoggerService
 	merchantCustomerRepo domain.MerchantCustomersRepository
+	programRuleRepo      domain.ProgramRuleRepository
 	logger               zerolog.Logger
 }
 
@@ -23,14 +25,47 @@ func NewTransactionService(
 	pointsService domain.PointsService,
 	eventLoggerService domain.EventLoggerService,
 	merchantCustomerRepo domain.MerchantCustomersRepository,
+	programRuleRepo domain.ProgramRuleRepository,
 ) *TransactionService {
 	return &TransactionService{
 		transactionRepo:      transactionRepo,
 		pointsService:        pointsService,
 		eventLoggerService:   eventLoggerService,
 		merchantCustomerRepo: merchantCustomerRepo,
+		programRuleRepo:      programRuleRepo,
 		logger:               logging.GetLogger(),
 	}
+}
+
+// computeEarnedPoints consults the active ProgramRules for req.ProgramID and runs
+// the rewards engine against the transaction. No matching rule falls back to 0
+// points rather than a hardcoded formula (FR-1.2).
+func (s *TransactionService) computeEarnedPoints(ctx context.Context, req *domain.CreateTransactionRequest) (int, error) {
+	rules, err := s.programRuleRepo.GetActiveRules(ctx, req.ProgramID, time.Now())
+	if err != nil {
+		return 0, err
+	}
+
+	engineRules := make([]ProgramRule, 0, len(rules))
+	for _, r := range rules {
+		engineRules = append(engineRules, ProgramRule{
+			RuleName:       r.RuleName,
+			ConditionType:  r.ConditionType,
+			ConditionValue: r.ConditionValue,
+			Multiplier:     r.Multiplier,
+			PointsAwarded:  r.PointsAwarded,
+			EffectiveFrom:  r.EffectiveFrom,
+			EffectiveTo:    r.EffectiveTo,
+		})
+	}
+
+	program := Program{ProgramID: req.ProgramID.String(), Rules: engineRules}
+	tx := Transaction{
+		Amount: req.TransactionAmount,
+		Type:   req.TransactionType,
+	}
+
+	return int(calculatePoints(program, tx)), nil
 }
 
 func (s *TransactionService) getMerchantIDByCustomerID(ctx context.Context, customerID uuid.UUID) (uuid.UUID, error) {
@@ -83,23 +118,22 @@ func (s *TransactionService) Create(ctx context.Context, req *domain.CreateTrans
 		return nil, domain.NewSystemError("TransactionService.Create", err, "failed to create transaction")
 	}
 
-	// Calculate points based on transaction amount and type
+	// Calculate points: earn types go through the rule engine (FR-1.2); refund
+	// deducts the transacted amount 1:1.
 	var points int
 	switch transaction.TransactionType {
-	case "purchase":
-		points = int(transaction.TransactionAmount) // Example: 1 point per currency unit
+	case "purchase", "bonus":
+		earned, err := s.computeEarnedPoints(ctx, req)
+		if err != nil {
+			s.logger.Error().
+				Err(err).
+				Msg("Error computing earned points from rule engine")
+			return nil, domain.NewSystemError("TransactionService.Create", err, "failed to compute earned points")
+		}
+		points = earned
 	case "refund":
 		points = -int(transaction.TransactionAmount)
-	case "bonus":
-		points = int(transaction.TransactionAmount * 2) // Example: Double points for bonus
-	case "redemption":
-		points = int(transaction.TransactionAmount * -1)
 	}
-
-	// TODO: Check if the transaction is valid for the program, branch/merchant
-	// TODO: Calculate points based on the transaction type and program rules
-	// TODO: Check if the customer has enough points to redeem
-	// TODO: Update points balance if applicable
 
 	if points > 0 {
 		if _, err := s.pointsService.EarnPoints(ctx, &domain.PointsTransaction{

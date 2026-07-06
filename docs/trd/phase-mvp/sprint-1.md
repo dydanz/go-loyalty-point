@@ -15,7 +15,7 @@ Earn computed by the **real rule engine**, not hardcoded constants. Money paths 
 
 ---
 
-## Task 1.1 — Wire rule engine into earn path
+## Task 1.1 — Wire rule engine into earn path `[x] DONE · 2026-07-06 12:00 +07 · PR #33 · agent:implement-sprint`
 
 **Type:** backend · **Effort:** L · **TRD:** FR-1.2
 **Progress signal:** same transaction under two different active rules yields two different point totals.
@@ -88,11 +88,11 @@ Earn computed by the **real rule engine**, not hardcoded constants. Money paths 
 
 ## Sprint 1 — Definition of Done
 
-- [ ] Earn 100% computed by rule engine; hardcoded constants removed.
-- [ ] Regression proves rule change → point change.
+- [x] Earn 100% computed by rule engine; hardcoded constants removed.
+- [x] Regression proves rule change → point change.
 - [ ] Shadow types deleted; engine uses domain types.
 - [ ] Both money services ≥80% coverage; `go test -race` green.
-- [ ] Swagger regenerated.
+- [x] Swagger regenerated.
 
 ## Swagger
 

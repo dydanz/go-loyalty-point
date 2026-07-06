@@ -27,7 +27,7 @@ func NewTransactionHandler(transactionService domain.TransactionService) *Transa
 
 // CreateTransaction godoc
 // @Summary Create transaction
-// @Description Create a new transaction
+// @Description Create a new transaction. Points earned on purchase/bonus transactions are computed by the program's active rule engine (no matching rule awards 0 points); refunds deduct the transacted amount 1:1.
 // @Tags transactions
 // @Accept json
 // @Produce json
