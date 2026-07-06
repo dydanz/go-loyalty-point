@@ -3,38 +3,11 @@ package service
 import (
 	"fmt"
 	"time"
+
+	"go-playground/server/domain"
 )
 
-type Transaction struct {
-	Amount           float64
-	Type             string
-	Category         string
-	MerchantID       string
-	MerchantGroupID  string
-	TransactionCount int
-	MembershipTenure int // in days
-}
-
-type ProgramRule struct {
-	RuleName       string
-	ConditionType  string
-	ConditionValue string
-	Multiplier     float64
-	PointsAwarded  int
-	EffectiveFrom  time.Time
-	EffectiveTo    *time.Time
-}
-
-type Program struct {
-	ProgramID         string
-	MerchantID        string
-	UserID            string
-	ProgramName       string
-	PointCurrencyName string
-	Rules             []ProgramRule
-}
-
-func evaluateRule(rule ProgramRule, tx Transaction) (bool, float64) {
+func evaluateRule(rule *domain.ProgramRule, tx domain.Transaction) (bool, float64) {
 	switch rule.ConditionType {
 	case "program_rule_tenure":
 		// Check if membership tenure meets the condition
@@ -43,9 +16,9 @@ func evaluateRule(rule ProgramRule, tx Transaction) (bool, float64) {
 
 	case "program_rule_transaction_amount":
 		// Check if transaction amount meets the condition
-		if tx.Amount > parseConditionValue(rule.ConditionValue) {
+		if tx.TransactionAmount > parseConditionValue(rule.ConditionValue) {
 			if rule.PointsAwarded == 0 {
-				return true, rule.Multiplier * tx.Amount
+				return true, rule.Multiplier * tx.TransactionAmount
 			}
 			return true, rule.Multiplier * float64(rule.PointsAwarded)
 		}
@@ -56,7 +29,7 @@ func evaluateRule(rule ProgramRule, tx Transaction) (bool, float64) {
 
 	case "program_rule_transaction_type":
 		// Check if transaction type matches the condition
-		return tx.Type == rule.ConditionValue, rule.Multiplier * float64(rule.PointsAwarded)
+		return tx.TransactionType == rule.ConditionValue, rule.Multiplier * float64(rule.PointsAwarded)
 
 	case "program_rule_transaction_category":
 		// Check if transaction category matches the condition
@@ -64,7 +37,7 @@ func evaluateRule(rule ProgramRule, tx Transaction) (bool, float64) {
 
 	case "program_rule_transaction_merchant":
 		// Check if transaction merchant matches the condition
-		return tx.MerchantID == rule.ConditionValue, rule.Multiplier * float64(rule.PointsAwarded)
+		return tx.MerchantID.String() == rule.ConditionValue, rule.Multiplier * float64(rule.PointsAwarded)
 
 	case "program_rule_transaction_merchant_group":
 		// Check if transaction merchant group matches the condition
@@ -82,14 +55,19 @@ func parseConditionValue(condition string) float64 {
 	return value
 }
 
-func calculatePoints(program Program, tx Transaction) float64 {
+// calculatePoints evaluates every active rule against tx and sums the points
+// awarded. Transaction-amount rules are summed as base points, all other
+// condition types as bonus points, so an amount rule and a bonus rule both
+// matching contribute independently rather than the second overwriting the
+// first.
+func calculatePoints(rules []*domain.ProgramRule, tx domain.Transaction) float64 {
 	totalPoints := 0.0
 	basePoints := 0.0
 	bonusPoints := 0.0
 	now := time.Now()
 
 	// First pass: Calculate base points from transaction amount rules
-	for _, rule := range program.Rules {
+	for _, rule := range rules {
 		if rule.ConditionType == "program_rule_transaction_amount" {
 			// Skip expired or future rules
 			if now.Before(rule.EffectiveFrom) || (rule.EffectiveTo != nil && now.After(*rule.EffectiveTo)) {
@@ -104,7 +82,7 @@ func calculatePoints(program Program, tx Transaction) float64 {
 	}
 
 	// Second pass: Calculate bonus points from other rules
-	for _, rule := range program.Rules {
+	for _, rule := range rules {
 		// Skip expired or future rules
 		if now.Before(rule.EffectiveFrom) || (rule.EffectiveTo != nil && now.After(*rule.EffectiveTo)) {
 			continue
@@ -122,49 +100,3 @@ func calculatePoints(program Program, tx Transaction) float64 {
 	totalPoints = basePoints + bonusPoints
 	return totalPoints
 }
-
-/*
-
-func main() {
-    // Example transaction
-    tx := Transaction{
-        Amount:           150.0,
-        Type:             "credit_card",
-        Category:         "food",
-        MerchantID:       "merchant_123",
-        MerchantGroupID:  "group_456",
-        TransactionCount: 12,
-        MembershipTenure: 365,
-    }
-
-    // Example program with rules
-    program := Program{
-        ProgramID: "program_123",
-        Rules: []ProgramRule{
-            {
-                RuleName:       "10th Transaction",
-                ConditionType:  "program_rule_transaction_count",
-                ConditionValue: "10",
-                Multiplier:     1.0,
-                PointsAwarded:  100,
-                EffectiveFrom:  time.Now().AddDate(0, -1, 0), // Active since 1 month ago
-                EffectiveTo:    nil,
-            },
-            {
-                RuleName:       "Transaction above $100",
-                ConditionType:  "program_rule_transaction_amount",
-                ConditionValue: "100",
-                Multiplier:     0.05, // 5% of transaction amount
-                PointsAwarded:  0,
-                EffectiveFrom:  time.Now().AddDate(0, -1, 0),
-                EffectiveTo:    nil,
-            },
-        },
-    }
-
-    // Calculate points
-    points := calculatePoints(program, tx)
-    fmt.Printf("Total points awarded: %.2f\n", points)
-}
-
-*/

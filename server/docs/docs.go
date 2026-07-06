@@ -3532,10 +3532,21 @@ const docTemplate = `{
                 "branch_id": {
                     "type": "string"
                 },
+                "category": {
+                    "description": "Rule-evaluation context. Not persisted (no transactions table column);\npopulated by the caller before running the rewards engine so program\nrules of these condition types (program_rule_transaction_category,\n_merchant_group, _transaction_count, _tenure) can match. Zero value\nwhen unset, so existing JSON responses are unaffected.",
+                    "type": "string"
+                },
                 "created_at": {
                     "type": "string"
                 },
+                "membership_tenure": {
+                    "description": "in days",
+                    "type": "integer"
+                },
                 "merchant_customers_id": {
+                    "type": "string"
+                },
+                "merchant_group_id": {
                     "type": "string"
                 },
                 "merchant_id": {
@@ -3549,6 +3560,9 @@ const docTemplate = `{
                 },
                 "transaction_amount": {
                     "type": "number"
+                },
+                "transaction_count": {
+                    "type": "integer"
                 },
                 "transaction_date": {
                     "type": "string"
