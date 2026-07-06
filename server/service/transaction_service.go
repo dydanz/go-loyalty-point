@@ -37,35 +37,15 @@ func NewTransactionService(
 	}
 }
 
-// computeEarnedPoints consults the active ProgramRules for req.ProgramID and runs
-// the rewards engine against the transaction. No matching rule falls back to 0
-// points rather than a hardcoded formula (FR-1.2).
-func (s *TransactionService) computeEarnedPoints(ctx context.Context, req *domain.CreateTransactionRequest) (int, error) {
-	rules, err := s.programRuleRepo.GetActiveRules(ctx, req.ProgramID, time.Now())
+// computeEarnedPoints consults the active ProgramRules for the transaction's
+// program and runs the rewards engine against it. No matching rule falls back
+// to 0 points rather than a hardcoded formula (FR-1.2).
+func (s *TransactionService) computeEarnedPoints(ctx context.Context, tx *domain.Transaction) (int, error) {
+	rules, err := s.programRuleRepo.GetActiveRules(ctx, tx.ProgramID, time.Now())
 	if err != nil {
 		return 0, err
 	}
-
-	engineRules := make([]ProgramRule, 0, len(rules))
-	for _, r := range rules {
-		engineRules = append(engineRules, ProgramRule{
-			RuleName:       r.RuleName,
-			ConditionType:  r.ConditionType,
-			ConditionValue: r.ConditionValue,
-			Multiplier:     r.Multiplier,
-			PointsAwarded:  r.PointsAwarded,
-			EffectiveFrom:  r.EffectiveFrom,
-			EffectiveTo:    r.EffectiveTo,
-		})
-	}
-
-	program := Program{ProgramID: req.ProgramID.String(), Rules: engineRules}
-	tx := Transaction{
-		Amount: req.TransactionAmount,
-		Type:   req.TransactionType,
-	}
-
-	return int(calculatePoints(program, tx)), nil
+	return int(calculatePoints(rules, *tx)), nil
 }
 
 func (s *TransactionService) getMerchantIDByCustomerID(ctx context.Context, customerID uuid.UUID) (uuid.UUID, error) {
@@ -123,7 +103,7 @@ func (s *TransactionService) Create(ctx context.Context, req *domain.CreateTrans
 	var points int
 	switch transaction.TransactionType {
 	case "purchase", "bonus":
-		earned, err := s.computeEarnedPoints(ctx, req)
+		earned, err := s.computeEarnedPoints(ctx, transaction)
 		if err != nil {
 			s.logger.Error().
 				Err(err).

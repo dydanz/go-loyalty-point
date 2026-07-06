@@ -37,7 +37,7 @@ Earn computed by the **real rule engine**, not hardcoded constants. Money paths 
 
 ---
 
-## Task 1.2 — Delete shadow types
+## Task 1.2 — Delete shadow types `[x] DONE · 2026-07-06 20:00 +07 · PR #34 · agent:implement-sprint`
 
 **Type:** backend · **Effort:** S · **TRD:** FR-1.2, S1
 **Progress signal:** engine compiles against domain types only; duplicate types gone, tests still green.
@@ -90,7 +90,7 @@ Earn computed by the **real rule engine**, not hardcoded constants. Money paths 
 
 - [x] Earn 100% computed by rule engine; hardcoded constants removed.
 - [x] Regression proves rule change → point change.
-- [ ] Shadow types deleted; engine uses domain types.
+- [x] Shadow types deleted; engine uses domain types.
 - [ ] Both money services ≥80% coverage; `go test -race` green.
 - [x] Swagger regenerated.
 
