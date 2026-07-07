@@ -54,7 +54,7 @@ Earn computed by the **real rule engine**, not hardcoded constants. Money paths 
 
 ---
 
-## Task 1.3 — Test coverage: `TransactionService.Create`
+## Task 1.3 — Test coverage: `TransactionService.Create` `[x] DONE · 2026-07-07 09:00 +07 · agent:implement-sprint`
 
 **Type:** backend · **Effort:** M · **TRD:** §2.4 S8, §6.5 (≥80%)
 **Progress signal:** coverage report ≥80% on the service; CI gate green.
