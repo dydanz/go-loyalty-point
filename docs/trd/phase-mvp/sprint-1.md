@@ -1,4 +1,4 @@
-# Sprint 1 — Rule Engine + Money-Path Tests
+# Sprint 1 — Rule Engine + Money-Path Tests `[x] DONE · 2026-07-09 09:00 +07 · PR #36 · agent:implement-sprint`
 
 > **Phase:** MVP · **Duration:** 2 weeks · **TRD anchor:** FR-1.2, S1 (§2.3), §3.3 principle 3
 > **Depends on:** Sprint 0 complete.
@@ -70,7 +70,7 @@ Earn computed by the **real rule engine**, not hardcoded constants. Money paths 
 
 ---
 
-## Task 1.4 — Test coverage: `RedemptionService.Create`
+## Task 1.4 — Test coverage: `RedemptionService.Create` `[x] DONE · 2026-07-09 09:00 +07 · PR #36 · agent:implement-sprint`
 
 **Type:** backend · **Effort:** M · **TRD:** FR-1.3, §2.4 S8
 **Progress signal:** redeem coverage ≥80%; failed-redeem-deducts-nothing test passes.
@@ -91,7 +91,7 @@ Earn computed by the **real rule engine**, not hardcoded constants. Money paths 
 - [x] Earn 100% computed by rule engine; hardcoded constants removed.
 - [x] Regression proves rule change → point change.
 - [x] Shadow types deleted; engine uses domain types.
-- [ ] Both money services ≥80% coverage; `go test -race` green.
+- [x] Both money services ≥80% coverage; `go test -race` green.
 - [x] Swagger regenerated.
 
 ## Swagger
