@@ -65,6 +65,30 @@ services:
     volumes: 
        - redis_data:/data
 
+  n8n:
+    container_name: n8n
+    image: n8nio/n8n:latest
+    restart: always
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=${N8N_HOST:-localhost}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=${N8N_PROTOCOL:-http}
+      - N8N_USER_MANAGEMENT_DISABLED=true
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres_primary
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=go_cursor
+      - DB_POSTGRESDB_USER=postgres
+      - DB_POSTGRESDB_PASSWORD=postgres
+      - WEBHOOK_URL=${N8N_WEBHOOK_URL:-http://localhost:5678/}
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-UTC}
+    volumes:
+      - n8n_data:/home/node/.n8n
+    depends_on:
+      - postgres_primary
+
 #  # Disable kafka and zookeeper, focus on postgres and redis for CQRS Approach
 #  # TODO: Enable kafka and zookeeper when we have a use case for Event Sourcing
 #
@@ -99,4 +123,5 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  n8n_data:
   kafka_data:
